@@ -1,0 +1,30 @@
+1. Retrieve the Top 5 Customers Who Have Purchased the Most Books (by Total Quantity) Over the Last Year:
+
+SELECT c.customer_id, c.name, c.email, SUM(od.quantity) AS total_books_purchased
+FROM Customers c
+JOIN Orders o ON c.customer_id = o.customer_id
+JOIN OrderDetails od ON o.order_id = od.order_id
+WHERE o.order_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+GROUP BY c.customer_id, c.name, c.email
+ORDER BY total_books_purchased DESC
+LIMIT 5;
+
+2. Calculate the Total Revenue Generated from Book Sales by Each Author:
+
+SELECT b.author, SUM(od.quantity * b.price) AS total_revenue
+FROM Books b
+JOIN OrderDetails od ON b.book_id = od.book_id
+JOIN Orders o ON od.order_id = o.order_id
+GROUP BY b.author
+ORDER BY total_revenue DESC;
+
+3. Retrieve All Books That Have Been Ordered More Than 10 Times, Along with the Total Quantity Ordered for Each Book:
+
+SELECT b.book_id, b.title, COUNT(DISTINCT o.order_id) AS total_orders, SUM(od.quantity) AS total_quantity_ordered
+FROM Books b
+JOIN OrderDetails od ON b.book_id = od.book_id
+JOIN Orders o ON od.order_id = o.order_id
+GROUP BY b.book_id, b.title
+HAVING total_orders > 10
+ORDER BY total_quantity_ordered DESC;
+
