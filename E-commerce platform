@@ -1,0 +1,54 @@
+code stub
+
+# User class
+class User:
+    def __init__(self, user_id, name, email):
+        self.user_id = user_id
+        self.name = name
+        self.email = email
+        self.orders = []
+
+    def create_order(self, products):
+        order = Order(order_id=len(self.orders) + 1, user_id=self.user_id, products=products)
+        self.orders.append(order)
+        return order
+
+    def view_orders(self):
+        return self.orders
+
+# Product class
+class Product:
+    def __init__(self, product_id, name, price):
+        self.product_id = product_id
+        self.name = name
+        self.price = price
+
+# Order class
+class Order:
+    def __init__(self, order_id, user_id, products):
+        self.order_id = order_id
+        self.user_id = user_id
+        self.products = products
+        self.status = 'Pending'
+        self.payment = None
+
+    def add_payment(self, payment):
+        self.payment = payment
+        self.status = 'Completed'
+
+    def get_total_price(self):
+        return sum([product.price for product in self.products])
+
+    def set_status(self, status):
+        self.status = status
+
+# Payment class
+class Payment:
+    def __init__(self, payment_id, order_id, amount):
+        self.payment_id = payment_id
+        self.order_id = order_id
+        self.amount = amount
+        self.payment_date = None
+
+    def process_payment(self, payment_date):
+        self.payment_date = payment_date
