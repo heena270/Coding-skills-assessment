@@ -1,0 +1,93 @@
+PART 2 : Business Logic Implementation 
+# Product class to hold product information
+class Product:
+    def __init__(self, product_id, name, stock_level):
+        self.product_id = product_id
+        self.name = name
+        self.stock_level = stock_level
+
+    def __str__(self):
+        return f"{self.name} (ID: {self.product_id}): Stock Level = {self.stock_level}"
+
+
+# Function to process sales orders
+def process_orders(products, orders, threshold=10):
+    """
+    Processes incoming sales orders and reduces the stock levels accordingly.
+    If stock drops below the threshold, an alert is triggered for restocking.
+
+    :param products: List of Product objects with current stock levels
+    :param orders: List of dictionaries containing 'product_id' and 'quantity'
+    :param threshold: Stock threshold below which restocking is required
+    :return: List of products that need restocking
+    """
+    restock_list = []
+
+    for order in orders:
+        product_id = order['product_id']
+        quantity = order['quantity']
+
+        # Find the product in the product list
+        product = next((p for p in products if p.product_id == product_id), None)
+
+        if product:
+            # Check if there is enough stock
+            if product.stock_level >= quantity:
+                # Process the order by reducing stock
+                product.stock_level -= quantity
+                print(f"Processed order for {quantity} of {product.name}.")
+                
+                # Check if stock falls below the threshold
+                if product.stock_level < threshold:
+                    restock_list.append((product, threshold - product.stock_level))
+                    print(f"Alert: {product.name} needs restocking! Current stock: {product.stock_level}.")
+            else:
+                print(f"Error: Not enough stock for {product.name}. Available: {product.stock_level}, Ordered: {quantity}")
+        else:
+            print(f"Error: Product with ID {product_id} not found.")
+    
+    return restock_list
+
+
+# Function to restock items
+def restock_items(products, restock_list):
+    """
+    Restocks the items based on the restock list.
+    
+    :param products: List of Product objects with current stock levels
+    :param restock_list: List of tuples containing Product object and required restock quantity
+    """
+    for product, restock_qty in restock_list:
+        product.stock_level += restock_qty
+        print(f"Restocked {product.name} by {restock_qty} units. New stock level: {product.stock_level}")
+
+
+# Example Usage
+if __name__ == "__main__":
+    # Initialize products with their stock levels
+    products = [
+        Product(product_id=1, name="Product A", stock_level=15),
+        Product(product_id=2, name="Product B", stock_level=8),
+        Product(product_id=3, name="Product C", stock_level=5)
+    ]
+    
+    # List of incoming sales orders
+    orders = [
+        {'product_id': 1, 'quantity': 5},
+        {'product_id': 2, 'quantity': 2},
+        {'product_id': 3, 'quantity': 6},  # Should trigger an error (not enough stock)
+        {'product_id': 2, 'quantity': 6}   # Should trigger restocking alert
+    ]
+    
+    # Process orders and get the restock list
+    restock_list = process_orders(products, orders)
+    
+    # Restock items based on the restock list
+    if restock_list:
+        restock_items(products, restock_list)
+
+    # Output the final stock levels
+    print("\nFinal stock levels:")
+    for product in products:
+        print(product)
+
